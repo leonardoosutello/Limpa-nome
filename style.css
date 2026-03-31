@@ -1,0 +1,76 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0f0f14;
+    color: white;
+    padding-bottom: 80px;
+}
+
+/* LOCK */
+.lock {
+    height: 100vh; display: flex; justify-content: center; align-items: center;
+    flex-direction: column; position: fixed; top: 0; left: 0; width: 100%; z-index: 2000;
+}
+
+.topo {
+    background: #000; padding: 20px; border-radius: 0 0 25px 25px;
+    border-bottom: 1px solid #333;
+}
+.perfil { display: flex; align-items: center; gap: 15px; }
+.perfil img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #2ecc71; object-fit: cover; }
+
+.filtros { display: flex; justify-content: center; gap: 8px; margin: 15px 0; }
+.filtros button {
+    padding: 8px 18px; border-radius: 25px; border: 1px solid rgba(255,255,255,.2);
+    background: transparent; color: white; cursor: pointer;
+}
+.filtros button.ativo { background: white; color: #000; font-weight: bold; }
+
+/* RESUMO MENSAL */
+.mes-container { margin-bottom: 30px; }
+.cabecalho-mes { display: flex; justify-content: space-between; padding: 0 15px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+.resumo-mes { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 10px 15px; background: #1c1c26; padding: 12px; border-radius: 12px; text-align: center; border: 1px solid #333; }
+.resumo-item small { display: block; color: #aaa; font-size: 11px; margin-bottom: 4px; }
+.texto-verde { color: #2ecc71; }
+.texto-branco { color: #fff; }
+
+/* BARRA DE PROGRESSO */
+.barra-container { grid-column: span 3; margin-top: 8px; text-align: center; }
+.barra-fundo { background: rgba(0,0,0,0.5); height: 12px; border-radius: 6px; overflow: hidden; border: 1px solid #444; }
+.barra-preenchimento { height: 100%; background: linear-gradient(90deg, #2ecc71, #27ae60); width: 0%; transition: 0.5s; }
+.barra-texto { font-size: 10px; color: #aaa; margin-top: 4px; font-weight: bold; }
+
+/* DIVIDAS CARD */
+.conta {
+    background: linear-gradient(135deg,#1c1c26,#16161f); margin: 15px 10px; padding: 15px;
+    border-radius: 18px; border-left: 5px solid #2ecc71; position: relative;
+}
+.conta.atrasada { border-left-color: #ef5350; }
+
+.info-parcelas { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; margin-top: 10px; font-size: 12px; border: 1px solid #333; }
+.desconto-badge { background: #ffb703; color: #000; padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; margin-left: 10px; }
+
+/* BOTOES AÇÃO */
+.acoes-principal { display: flex; gap: 10px; margin-top: 15px; }
+.acoes-principal button { flex: 1; padding: 12px; font-size: 14px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; color: white; }
+.btn-pagar { background: #2ecc71; }
+.btn-reverter { background: #e67e22; }
+.btn-expandir { flex: 0.2 !important; background: #fff !important; color: #000 !important; font-size: 18px; }
+
+/* MENU SECUNDARIO */
+.menu-secundario { display: none; flex-direction: column; gap: 8px; background: #2a2a36; padding: 10px; margin-top: 10px; border-radius: 8px; border: 1px solid #444; }
+.menu-secundario button { width: 100%; text-align: left; padding: 12px; background: transparent; border: 1px solid #555; border-radius: 6px; color: #ccc; cursor: pointer; }
+
+/* RODAPE */
+.rodape { position: fixed; bottom: 0; width: 100%; background: #111; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #333; z-index: 1000; }
+.rodape button { background: #222; color: white; border: 1px solid #444; padding: 10px 20px; border-radius: 20px; font-size: 14px; cursor: pointer; }
+
+/* MODAL */
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 3000; }
+.modal-conteudo { background: #1c1c26; width: 90%; max-width: 350px; border-radius: 16px; padding: 20px; border: 1px solid #444; color: white; }
+.modal-conteudo label { font-size: 12px; color: #aaa; display: block; margin-bottom: 5px; }
+.modal-conteudo input { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #444; background: #222; color: white; box-sizing: border-box; }
+.modal-conteudo button { padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; }
+
+.calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.calc-grid button { padding: 15px; font-size: 18px; border-radius: 10px; background: #333; border: 1px solid #444; }

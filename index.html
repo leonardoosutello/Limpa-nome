@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Limpa Nome - Acordos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f0f14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<div id="lock" class="lock" style="background: #0f0f14;">
+  <div style="text-align:center; padding: 20px; max-width: 300px;">
+    <div style="font-size: 60px; margin-bottom: 20px;">🤝</div>
+    <h2 style="color:white; margin-bottom: 10px;">Limpa Nome</h2>
+    <p style="color: #888; margin-bottom: 20px; font-size: 14px;">Acesse seus acordos e dívidas</p>
+    
+    <input type="email" id="loginEmail" placeholder="E-mail" style="width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #444; background: #222; color: white; margin-bottom: 10px; box-sizing: border-box;">
+    <input type="password" id="loginSenha" placeholder="Senha" style="width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #444; background: #222; color: white; margin-bottom: 20px; box-sizing: border-box;">
+    
+    <button onclick="fazerLoginFirebase()" style="width: 100%; background:#2ecc71; color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; margin-bottom: 15px; cursor: pointer;">ENTRAR</button>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+  <div class="topo">
+    <div class="perfil" onclick="abrirPerfil()">
+      <img id="fotoPerfil" src="https://via.placeholder.com/50" alt="Foto">
+      <div>
+          <h2 id="nomePerfil" style="margin:0; font-size:16px;">Usuário</h2>
+          <small style="color: #2ecc71;">Ver perfil ⚙️</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="filtros">
+    <button class="ativo" onclick="setFiltro('todas', this)">Todos</button>
+    <button onclick="setFiltro('pagas', this)">Quitados</button>
+  </div>
+
+  <div id="lista" class="lista"></div>
+
+  <div class="rodape">
+    <button onclick="adicionarDivida()">➕ Novo Acordo</button>
+    <button onclick="abrirCalculadora()">🧮 Calc</button>
+  </div>
+</div>
+
+<div id="modalPerfil" class="modal" style="display:none;">
+    <div class="modal-conteudo" style="text-align: center;">
+        <h3>⚙️ Meu Perfil</h3>
+        
+        <img id="previewFotoPerfil" src="https://via.placeholder.com/100" style="width:90px; height:90px; border-radius:50%; object-fit:cover; margin-bottom:10px; border: 2px solid #2ecc71;">
+        <br>
+        <button onclick="document.getElementById('uploadFotoNova').click()" style="background:#444; padding:8px 15px; font-size:12px;">📸 Alterar Foto</button>
+        <input type="file" id="uploadFotoNova" hidden accept="image/*" onchange="salvarNovaFoto(event)">
+        
+        <label style="margin-top:15px; display:block;">Nome de Exibição</label>
+        <input type="text" id="inputNomePerfil" placeholder="Seu Nome" style="text-align:center;">
+        <button onclick="salvarNomePerfil()" style="background:#2ecc71; width:100%; margin-bottom:20px;">💾 Salvar Nome</button>
+
+        <hr style="border:1px solid #333; margin:15px 0;">
+        
+        <button onclick="sairDaConta()" style="background:#ef5350; width:100%;">🚪 SAIR DA CONTA</button>
+        <button onclick="fecharModalPerfil()" style="background:transparent; border:1px solid #444; width:100%; margin-top:10px;">Voltar</button>
+    </div>
+</div>
+
+<div id="modalNovaDivida" class="modal" style="display:none;">
+    <div class="modal-conteudo">
+        <h3 style="margin-top:0; text-align:center; color:#ffffff;">➕ Registrar Acordo</h3>
+        
+        <label>Credor (Ex: Nubank, Itaú)</label>
+        <input id="newNome" type="text" placeholder="Nome do banco/loja">
+        
+        <label>Valor Original da Dívida (Opcional)</label>
+        <input id="newValorOriginal" type="number" placeholder="Ex: 5000.00">
+
+        <label>Valor do ACORDO (Fechado)</label>
+        <input id="newValor" type="number" placeholder="Ex: 1500.00" oninput="calcularPrevia()">
+        
+        <label>Vencimento da 1ª Parcela</label>
+        <input id="newData" type="date">
+        
+        <div style="background:#2a2a36; padding:10px; border-radius:8px; margin-bottom:15px; margin-top:10px;">
+            <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                <input id="newParcelado" type="checkbox" onchange="toggleParcelasInput()" style="width:20px; height:20px;">
+                <span>Acordo Parcelado?</span>
+            </label>
+            
+            <div id="divParcelas" style="display:none; margin-top:10px; border-top:1px solid #444; padding-top:10px;">
+                <label>Quantas vezes?</label>
+                <input id="newQtd" type="number" placeholder="Ex: 12" oninput="calcularPrevia()">
+                <p id="txtPrevia" style="font-size:13px; color:#00e676; margin-top:5px; text-align:center; font-weight:bold;"></p>
+            </div>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+            <button onclick="salvarDividaFormulario()" style="flex:1; background:#2ecc71;">SALVAR</button>
+            <button onclick="fecharModalAdicionar()" style="flex:1; background:#444;">CANCELAR</button>
+        </div>
+    </div>
+</div>
+
+<div id="modalCalc" class="modal" style="display:none">
+  <div class="modal-conteudo">
+    <h3>🧮 Calculadora</h3>
+    <input type="text" id="calcDisplay" readonly style="width:100%; height:40px; font-size:20px; text-align:right; margin-bottom:10px;">
+    <div class="calc-grid">
+      <button onclick="calcAdd('7')">7</button><button onclick="calcAdd('8')">8</button><button onclick="calcAdd('9')">9</button><button onclick="calcAdd('/')">÷</button>
+      <button onclick="calcAdd('4')">4</button><button onclick="calcAdd('5')">5</button><button onclick="calcAdd('6')">6</button><button onclick="calcAdd('*')">×</button>
+      <button onclick="calcAdd('1')">1</button><button onclick="calcAdd('2')">2</button><button onclick="calcAdd('3')">3</button><button onclick="calcAdd('-')">−</button>
+      <button onclick="calcAdd('0')">0</button><button onclick="calcAdd('.')">.</button><button onclick="calcCalcular()" style="background:#2ecc71; color:white;">=</button><button onclick="calcAdd('+')">+</button>
+    </div>
+    <button onclick="calcLimpar()" style="background:#ef5350; width:100%; padding:10px; margin-top:10px; color:white; border:none; border-radius:8px;">Limpar</button>
+    <button onclick="fecharCalculadora()" style="background:#444; width:100%; padding:10px; margin-top:10px; color:white; border:none; border-radius:8px;">Fechar</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("service-worker.js");
+    });
+  }
+</script>
+</body>
+</html>
