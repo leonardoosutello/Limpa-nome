@@ -2,15 +2,11 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="app-version" content="2.0.0">
   <title>Limpa Nome - Acordos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f0f14">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="apple-touch-icon" href="icon-192.png">
-
   <link rel="stylesheet" href="style.css">
   <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-auth-compat.js"></script>
@@ -22,28 +18,22 @@
   <div style="text-align:center; padding: 20px; max-width: 300px;">
     <div style="font-size: 60px; margin-bottom: 20px;">🤝</div>
     <h2 style="color:white; margin-bottom: 10px;">Limpa Nome</h2>
-    <p style="color: #888; margin-bottom: 20px; font-size: 14px;">Acesse seus acordos e dívidas</p>
-    
-    <input type="email" id="loginEmail" placeholder="E-mail" style="width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #444; background: #222; color: white; margin-bottom: 10px; box-sizing: border-box;">
-    <input type="password" id="loginSenha" placeholder="Senha" style="width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #444; background: #222; color: white; margin-bottom: 20px; box-sizing: border-box;">
-    
-    <button onclick="fazerLoginFirebase()" style="width: 100%; background:#2ecc71; color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; margin-bottom: 15px; cursor: pointer;">ENTRAR</button>
+    <input type="email" id="loginEmail" placeholder="E-mail" style="width:100%; padding:15px; border-radius:12px; border:1px solid #444; background:#222; color:white; margin-bottom:10px;">
+    <input type="password" id="loginSenha" placeholder="Senha" style="width:100%; padding:15px; border-radius:12px; border:1px solid #444; background:#222; color:white; margin-bottom:20px;">
+    <button onclick="fazerLoginFirebase()" style="width:100%; background:#2ecc71; color:white; padding:15px; border-radius:12px; font-weight:bold; border:none;">ENTRAR</button>
   </div>
 </div>
 
 <div id="app" style="display:none">
   <div class="topo">
     <div class="perfil" onclick="abrirPerfil()">
-      <img id="fotoPerfil" src="https://via.placeholder.com/50" alt="Foto">
-      <div>
-          <h2 id="nomePerfil" style="margin:0; font-size:16px;">Usuário</h2>
-          <small style="color: #2ecc71;">Ver perfil ⚙️</small>
-      </div>
+      <img id="fotoPerfil" src="https://via.placeholder.com/50">
+      <div><h2 id="nomePerfil" style="margin:0; font-size:16px;">Usuário</h2><small style="color: #2ecc71;">Perfil ⚙️</small></div>
     </div>
   </div>
 
   <div class="filtros">
-    <button class="ativo" onclick="setFiltro('todas', this)">Todos</button>
+    <button class="ativo" onclick="setFiltro('todas', this)">Pendentes</button>
     <button onclick="setFiltro('pagas', this)">Quitados</button>
   </div>
 
@@ -51,28 +41,9 @@
 
   <div class="rodape">
     <button onclick="adicionarDivida()">➕ Novo Acordo</button>
+    <button onclick="abrirAnaliseDiaria()" style="background: #7b2ff7;">📊 Fluxo</button>
     <button onclick="abrirCalculadora()">🧮 Calc</button>
   </div>
-</div>
-
-<div id="modalPerfil" class="modal" style="display:none;">
-    <div class="modal-conteudo" style="text-align: center;">
-        <h3>⚙️ Meu Perfil</h3>
-        
-        <img id="previewFotoPerfil" src="https://via.placeholder.com/100" style="width:90px; height:90px; border-radius:50%; object-fit:cover; margin-bottom:10px; border: 2px solid #2ecc71;">
-        <br>
-        <button onclick="document.getElementById('uploadFotoNova').click()" style="background:#444; padding:8px 15px; font-size:12px;">📸 Alterar Foto</button>
-        <input type="file" id="uploadFotoNova" hidden accept="image/*" onchange="salvarNovaFoto(event)">
-        
-        <label style="margin-top:15px; display:block;">Nome de Exibição</label>
-        <input type="text" id="inputNomePerfil" placeholder="Seu Nome" style="text-align:center;">
-        <button onclick="salvarNomePerfil()" style="background:#2ecc71; width:100%; margin-bottom:20px;">💾 Salvar Nome</button>
-
-        <hr style="border:1px solid #333; margin:15px 0;">
-        
-        <button onclick="sairDaConta()" style="background:#ef5350; width:100%;">🚪 SAIR DA CONTA</button>
-        <button onclick="fecharModalPerfil()" style="background:transparent; border:1px solid #444; width:100%; margin-top:10px;">Voltar</button>
-    </div>
 </div>
 
 <div id="modalNovaDivida" class="modal" style="display:none;">
@@ -111,28 +82,51 @@
     </div>
 </div>
 
-<div id="modalCalc" class="modal" style="display:none">
-  <div class="modal-conteudo">
-    <h3>🧮 Calculadora</h3>
-    <input type="text" id="calcDisplay" readonly style="width:100%; height:40px; font-size:20px; text-align:right; margin-bottom:10px;">
-    <div class="calc-grid">
-      <button onclick="calcAdd('7')">7</button><button onclick="calcAdd('8')">8</button><button onclick="calcAdd('9')">9</button><button onclick="calcAdd('/')">÷</button>
-      <button onclick="calcAdd('4')">4</button><button onclick="calcAdd('5')">5</button><button onclick="calcAdd('6')">6</button><button onclick="calcAdd('*')">×</button>
-      <button onclick="calcAdd('1')">1</button><button onclick="calcAdd('2')">2</button><button onclick="calcAdd('3')">3</button><button onclick="calcAdd('-')">−</button>
-      <button onclick="calcAdd('0')">0</button><button onclick="calcAdd('.')">.</button><button onclick="calcCalcular()" style="background:#2ecc71; color:white;">=</button><button onclick="calcAdd('+')">+</button>
+<div id="modalAnalise" class="modal" style="display:none;">
+    <div class="modal-conteudo" style="max-width: 400px;">
+        <h3 style="text-align:center; color:#7b2ff7;">📊 Fluxo Diário Integrado</h3>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <input type="month" id="mesFiltroAnalise" style="flex:1; padding:12px; border-radius:8px; background:#222; color:white; border:1px solid #444;">
+            <button onclick="gerarAnaliseDiaria()" style="background:#7b2ff7; padding:10px 20px; border-radius:8px; border:none; color:white; font-weight:bold;">VER</button>
+        </div>
+        <div id="corpoAnalise" style="max-height: 350px; overflow-y: auto;">
+            <p style="text-align:center; color:#666;">Selecione o mês e o ano para calcular.</p>
+        </div>
+
+        <button onclick="fecharAnaliseDiaria()" style="width:100%; background:#444; margin-top:15px; border:none; padding:12px; border-radius:8px; color:white;">Voltar</button>
     </div>
-    <button onclick="calcLimpar()" style="background:#ef5350; width:100%; padding:10px; margin-top:10px; color:white; border:none; border-radius:8px;">Limpar</button>
-    <button onclick="fecharCalculadora()" style="background:#444; width:100%; padding:10px; margin-top:10px; color:white; border:none; border-radius:8px;">Fechar</button>
-  </div>
 </div>
+
+
+
+<div id="modalPerfil" class="modal" style="display:none;">
+    <div class="modal-conteudo" style="text-align:center;">
+        <img id="previewFotoPerfil" style="width:90px; height:90px; border-radius:50%; border:2px solid #2ecc71;">
+        <input type="file" id="uploadFotoNova" hidden onchange="salvarNovaFoto(event)">
+        <button onclick="document.getElementById('uploadFotoNova').click()" style="background:#444; margin:10px 0;">📸 Foto</button>
+        <input type="text" id="inputNomePerfil" placeholder="Seu Nome">
+        <button onclick="salvarNomePerfil()" style="background:#2ecc71; width:100%;">💾 Salvar</button>
+        <button onclick="sairDaConta()" style="background:#ef5350; width:100%; margin-top:15px;">🚪 SAIR</button>
+        <button onclick="fecharModalPerfil()" style="background:transparent; border:1px solid #444; width:100%; margin-top:10px;">Voltar</button>
+    </div>
+</div>
+
+<div id="modalCalc" class="modal" style="display:none"><div class="modal-conteudo"><h3>🧮 Calc</h3><input type="text" id="calcDisplay" readonly><div class="calc-grid"><button onclick="calcAdd('7')">7</button><button onclick="calcAdd('8')">8</button><button onclick="calcAdd('9')">9</button><button onclick="calcAdd('/')">÷</button><button onclick="calcAdd('4')">4</button><button onclick="calcAdd('5')">5</button><button onclick="calcAdd('6')">6</button><button onclick="calcAdd('*')">×</button><button onclick="calcAdd('1')">1</button><button onclick="calcAdd('2')">2</button><button onclick="calcAdd('3')">3</button><button onclick="calcAdd('-')">−</button><button onclick="calcAdd('0')">0</button><button onclick="calcAdd('.')">.</button><button onclick="calcCalcular()" style="background:#2ecc71;">=</button><button onclick="calcAdd('+')">+</button></div><button onclick="calcLimpar()" style="background:#ef5350; width:100%; margin-top:10px;">C</button><button onclick="fecharCalculadora()" style="background:#444; width:100%; margin-top:10px;">Fechar</button></div></div>
 
 <script src="app.js"></script>
 <script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("service-worker.js");
-    });
-  }
+  if ("serviceWorker" in navigator) { navigator.serviceWorker.register("service-worker.js"); }
+  window.checarVersaoServidor = async function() {
+    try {
+      const resp = await fetch(window.location.origin + window.location.pathname + "?t=" + Date.now(), {cache:"no-store"});
+      const text = await resp.text();
+      const sv = new DOMParser().parseFromString(text, "text/html").querySelector('meta[name="app-version"]')?.content;
+      const lv = document.querySelector('meta[name="app-version"]')?.content;
+      if (sv && lv && sv !== lv) { if(confirm("Nova versão! Atualizar?")) { window.location.reload(true); } }
+    } catch(e) {}
+  };
+  setTimeout(window.checarVersaoServidor, 2000);
 </script>
 </body>
 </html>
