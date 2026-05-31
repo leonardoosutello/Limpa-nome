@@ -2,8 +2,8 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="app-version" content="2.0.0">
-  <title>Limpa Nome - Acordos</title>
+  <meta name="app-version" content="3.0.0">
+  <title>Limpa Nome - Acordos & Organização</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f0f14">
@@ -13,7 +13,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore-compat.js"></script>
 
   <style>
-    /* Estilos customizados e responsivos para o Chat do Sutello AI */
+    /* Estilos do Chat Interativo do Sutello AI */
     .modal-conteudo-chat {
         background: #13131a;
         width: 100%;
@@ -306,29 +306,21 @@
 <!-- MODAL SUTELLO AI CHAT (ORGANIZAÇÃO FINANCEIRA) -->
 <div id="modalSutelloChat" class="modal" style="display:none; align-items: center; justify-content: center;">
     <div class="modal-conteudo-chat">
-        <!-- Cabeçalho -->
         <div class="chat-header">
             <div class="chat-header-left">
-                <!-- Avatar do desenvolvedor Sutello (Estilo Vetor Amigável) -->
                 <div class="avatar-container">
                     <svg class="avatar-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="50" cy="50" r="48" fill="#7b2ff7"/>
-                        <!-- Rosto -->
                         <path d="M50,25 C33,25 32,45 32,55 C32,68 40,75 50,75 C60,75 68,68 68,55 C68,45 67,25 50,25 Z" fill="#ffd1b3"/>
-                        <!-- Cabelo Moderno Escuro -->
                         <path d="M50,20 C32,20 28,32 30,42 C33,35 40,32 50,35 C60,32 67,35 70,42 C72,32 68,20 50,20 Z" fill="#2d2d30"/>
                         <path d="M30,35 C28,35 27,42 27,48 C30,48 31,40 31,35 Z" fill="#2d2d30"/>
                         <path d="M70,35 C72,35 73,42 73,48 C70,48 69,40 69,35 Z" fill="#2d2d30"/>
-                        <!-- Óculos Inteligentes -->
                         <rect x="34" y="44" width="13" height="10" rx="3" fill="none" stroke="#111" stroke-width="2.5"/>
                         <rect x="53" y="44" width="13" height="10" rx="3" fill="none" stroke="#111" stroke-width="2.5"/>
                         <line x1="47" y1="49" x2="53" y2="49" stroke="#111" stroke-width="2.5"/>
-                        <!-- Olhos -->
                         <circle cx="40" cy="49" r="2" fill="#111"/>
                         <circle cx="60" cy="49" r="2" fill="#111"/>
-                        <!-- Sorriso Confiante -->
                         <path d="M45,63 Q50,68 55,63" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"/>
-                        <!-- Roupa Organizada -->
                         <path d="M30,73 C30,73 35,90 50,90 C65,90 70,73 70,73 L62,95 L38,95 Z" fill="#1a1a24"/>
                         <path d="M44,75 L50,83 L56,75" fill="none" stroke="#7b2ff7" stroke-width="3"/>
                     </svg>
@@ -342,10 +334,8 @@
             <button class="chat-close-btn" onclick="fecharSutelloChat()">&times;</button>
         </div>
 
-        <!-- Histórico de Mensagens -->
         <div id="chatHistoryContainer" class="chat-messages-container"></div>
 
-        <!-- Sugestões de Perguntas (Chips Rápidos deslizantes) -->
         <div class="chat-chips-container" id="chatChipsContainer">
             <button class="chat-chip" onclick="enviarTextoSugerido('Me mostre o resumo do mês atual')">📅 Resumo deste mês</button>
             <button class="chat-chip" onclick="enviarTextoSugerido('Mostre as contas pendentes deste mês')">🔍 Contas pendentes</button>
@@ -353,7 +343,6 @@
             <button class="chat-chip" onclick="enviarTextoSugerido('Me dê uma dica rápida de economia')">💡 Dica de economia</button>
         </div>
 
-        <!-- Área de Entrada de Texto -->
         <div class="chat-input-area">
             <input type="text" id="chatInputField" placeholder="Pergunte ao Sutello..." onkeydown="if(event.key === 'Enter') enviarMensagemSutello()">
             <button id="chatSendButton" onclick="enviarMensagemSutello()">
@@ -380,6 +369,7 @@
 
 <div id="modalCalc" class="modal" style="display:none"><div class="modal-conteudo"><h3>🧮 Calc</h3><input type="text" id="calcDisplay" readonly><div class="calc-grid"><button onclick="calcAdd('7')">7</button><button onclick="calcAdd('8')">8</button><button onclick="calcAdd('9')">9</button><button onclick="calcAdd('/')">÷</button><button onclick="calcAdd('4')">4</button><button onclick="calcAdd('5')">5</button><button onclick="calcAdd('6')">6</button><button onclick="calcAdd('*')">×</button><button onclick="calcAdd('1')">1</button><button onclick="calcAdd('2')">2</button><button onclick="calcAdd('3')">3</button><button onclick="calcAdd('-')">−</button><button onclick="calcAdd('0')">0</button><button onclick="calcAdd('.')">.</button><button onclick="calcCalcular()" style="background:#2ecc71;">=</button><button onclick="calcAdd('+')">+</button></div><button onclick="calcLimpar()" style="background:#ef5350; width:100%; margin-top:10px;">C</button><button onclick="fecharCalculadora()" style="background:#444; width:100%; margin-top:10px;">Fechar</button></div></div>
 
+<!-- Vinculação unificada estritamente para o app.js -->
 <script src="app.js"></script>
 <script>
   if ("serviceWorker" in navigator) { navigator.serviceWorker.register("service-worker.js"); }
@@ -396,3 +386,5 @@
 </script>
 </body>
 </html>
+```eof
+
