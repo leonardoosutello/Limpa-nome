@@ -1,115 +1,34 @@
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="app-version" content="5.1.0">
-  <title>Limpa Nome - Acordos & Organização</title>
+  <meta name="app-version" content="2.0.0">
+  <title>Limpa Nome - Acordos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f0f14">
-  
+  <link rel="stylesheet" href="style.css">
   <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore-compat.js"></script>
-
-  <style>
-    /* ================= ESTILOS GERAIS ================= */
-    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; outline: none; }
-    body { margin: 0; background-color: #0f0f14; color: #fff; padding-bottom: 85px; }
-    
-    .topo { padding: 20px; background: #1a1a24; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2a2a36; }
-    .perfil { display: flex; align-items: center; gap: 15px; cursor: pointer; }
-    .perfil img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #2ecc71; }
-    
-    .filtros { display: flex; gap: 10px; padding: 15px 20px; overflow-x: auto; scrollbar-width: none; }
-    .filtros::-webkit-scrollbar { display: none; }
-    .filtros button { padding: 8px 16px; border-radius: 20px; border: 1px solid #444; background: #222; color: #aaa; cursor: pointer; white-space: nowrap; font-weight: 500; transition: 0.3s; }
-    .filtros button.ativo { background: #2ecc71; color: #fff; border-color: #2ecc71; font-weight: bold; }
-    
-    .lista { padding: 0 20px; }
-    .mes-container { margin-bottom: 30px; animation: fadeIn 0.4s ease-out; }
-    .cabecalho-mes { margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 8px; }
-    .cabecalho-mes h3 { margin: 0; color: #fff; font-size: 18px; }
-    
-    .resumo-mes { background: #1a1a24; padding: 15px; border-radius: 12px; margin-bottom: 15px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; border: 1px solid #2a2a36; }
-    .resumo-item { display: flex; flex-direction: column; }
-    .resumo-item small { color: #8a8a9e; font-size: 11px; margin-bottom: 4px; }
-    .barra-container { grid-column: span 3; margin-top: 5px; }
-    .barra-fundo { background: #333; height: 8px; border-radius: 4px; overflow: hidden; width: 100%; }
-    .barra-preenchimento { background: #2ecc71; height: 100%; transition: width 0.5s ease; }
-    
-    .conta { background: #1a1a24; padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid #ef5350; position: relative; transition: transform 0.2s; border-top: 1px solid #2a2a36; border-right: 1px solid #2a2a36; border-bottom: 1px solid #2a2a36; }
-    .conta.verde { border-left-color: #2ecc71; opacity: 0.85; }
-    
-    .rodape { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(26,26,36,0.95); backdrop-filter: blur(10px); padding: 10px 15px; display: flex; justify-content: space-around; border-top: 1px solid #333; z-index: 100; gap: 10px; }
-    .rodape button { flex: 1; padding: 12px 0; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; background: #2a2a36; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 13px; gap: 4px; transition: 0.2s; }
-    .rodape button:hover { background: #3a3a46; }
-    .rodape button.destaque { background: #7b2ff7; }
-    .rodape button.destaque:hover { background: #651bc7; }
-    
-    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-    .modal-conteudo { background: #1a1a24; padding: 25px; border-radius: 20px; width: 90%; max-width: 400px; border: 1px solid #333; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.5); animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    
-    input, select { width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #333; background: #111116; color: white; margin-top: 6px; font-size: 15px; }
-    input:focus { border-color: #7b2ff7; }
-    button { cursor: pointer; border: none; padding: 14px; border-radius: 10px; color: white; font-weight: bold; font-size: 15px; transition: 0.2s; }
-    label { color: #8a8a9e; font-size: 13px; font-weight: 500; }
-    
-    .lock { display: flex; align-items: center; justify-content: center; height: 100vh; width: 100vw; position: fixed; top:0; left:0; z-index: 9999; background: #0f0f14; }
-    
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-
-    /* ================= ESTILOS DO CHAT SUTELLO AI ================= */
-    .modal-conteudo-chat { background: #13131a; width: 100%; max-width: 480px; height: 85vh; max-height: 750px; border-radius: 20px; border: 1px solid #23232f; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.6); animation: zoomIn 0.25s ease-out; }
-    @media (max-width: 480px) { .modal-conteudo-chat { height: 100%; max-height: 100%; border-radius: 0; border: none; } }
-    .chat-header { background: #1a1a24; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #23232f; }
-    .chat-header-left { display: flex; align-items: center; gap: 12px; }
-    .avatar-container { position: relative; width: 44px; height: 44px; }
-    .avatar-svg { width: 100%; height: 100%; }
-    .avatar-status { position: absolute; bottom: 1px; right: 1px; width: 10px; height: 10px; background: #2ecc71; border: 2px solid #1a1a24; border-radius: 50%; }
-    .chat-title { color: #ffffff; margin: 0; font-size: 16px; font-weight: 700; }
-    .chat-subtitle { color: #2ecc71; font-size: 11px; display: block; margin-top: 1px; font-weight: 500; }
-    .chat-close-btn { background: transparent; border: none; color: #8a8a9e; font-size: 28px; cursor: pointer; padding: 0 5px; }
-    .chat-messages-container { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #111116; scroll-behavior: smooth; }
-    .chat-bubble-wrapper { display: flex; flex-direction: column; width: 100%; }
-    .chat-bubble { max-width: 85%; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.5; word-wrap: break-word; }
-    .chat-bubble.sutello { background: #1a1a24; color: #e2e2e9; align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid #23232f; }
-    .chat-bubble.user { background: #7b2ff7; color: #ffffff; align-self: flex-end; border-bottom-right-radius: 4px; }
-    .chat-typing-indicator { display: flex; align-items: center; gap: 4px; padding: 12px 18px; background: #1a1a24; border-radius: 16px; align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid #23232f; margin-bottom: 5px; }
-    .chat-typing-dot { width: 8px; height: 8px; background: #7b2ff7; border-radius: 50%; animation: typingBreathe 1.4s infinite ease-in-out both; }
-    .chat-typing-dot:nth-child(2) { animation-delay: 0.2s; }
-    .chat-typing-dot:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes typingBreathe { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; } 40% { transform: scale(1.1); opacity: 1; } }
-    .chat-chips-container { padding: 10px 15px; display: flex; gap: 8px; overflow-x: auto; background: #111116; border-top: 1px solid #1a1a24; white-space: nowrap; scrollbar-width: none; }
-    .chat-chips-container::-webkit-scrollbar { display: none; }
-    .chat-chip { background: #1a1a24; color: #8a8a9e; border: 1px solid #23232f; padding: 8px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: all 0.2s; font-weight: 500; flex-shrink: 0; }
-    .chat-chip:hover { background: #7b2ff7; color: #ffffff; border-color: #7b2ff7; }
-    .chat-input-area { background: #1a1a24; padding: 12px 15px; display: flex; gap: 10px; align-items: center; border-top: 1px solid #23232f; }
-    .chat-input-area input { flex: 1; background: #111116; border: 1px solid #23232f; border-radius: 12px; padding: 12px 15px; color: #ffffff; font-size: 14px; margin: 0; outline: none; }
-    .chat-input-area input:focus { border-color: #7b2ff7; }
-    .chat-input-area button { width: 46px; height: 46px; background: #7b2ff7; border: none; border-radius: 12px; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; margin: 0; padding: 0; }
-  </style>
 </head>
 <body>
 
-<!-- TELA DE LOGIN -->
-<div id="lock" class="lock">
-  <div style="text-align:center; padding: 30px; max-width: 340px; width: 100%; background: #1a1a24; border-radius: 20px; border: 1px solid #2a2a36; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-    <div style="font-size: 50px; margin-bottom: 10px;">🤝</div>
-    <h2 style="color:white; margin-bottom: 25px; margin-top: 0;">Limpa Nome</h2>
-    <input type="email" id="loginEmail" placeholder="E-mail">
-    <input type="password" id="loginSenha" placeholder="Senha">
-    <button onclick="fazerLoginFirebase()" style="width:100%; background:#2ecc71; margin-top: 10px;">ENTRAR</button>
+<div id="lock" class="lock" style="background: #0f0f14;">
+  <div style="text-align:center; padding: 20px; max-width: 300px;">
+    <div style="font-size: 60px; margin-bottom: 20px;">🤝</div>
+    <h2 style="color:white; margin-bottom: 10px;">Limpa Nome</h2>
+    <input type="email" id="loginEmail" placeholder="E-mail" style="width:100%; padding:15px; border-radius:12px; border:1px solid #444; background:#222; color:white; margin-bottom:10px;">
+    <input type="password" id="loginSenha" placeholder="Senha" style="width:100%; padding:15px; border-radius:12px; border:1px solid #444; background:#222; color:white; margin-bottom:20px;">
+    <button onclick="fazerLoginFirebase()" style="width:100%; background:#2ecc71; color:white; padding:15px; border-radius:12px; font-weight:bold; border:none;">ENTRAR</button>
   </div>
 </div>
 
-<!-- APLICATIVO PRINCIPAL -->
 <div id="app" style="display:none">
   <div class="topo">
     <div class="perfil" onclick="abrirPerfil()">
-      <img id="fotoPerfil" src="https://via.placeholder.com/50" alt="Foto">
-      <div><h2 id="nomePerfil" style="margin:0; font-size:16px;">Usuário</h2><small style="color: #2ecc71; font-weight: bold;">Perfil ⚙️</small></div>
+      <img id="fotoPerfil" src="https://via.placeholder.com/50">
+      <div><h2 id="nomePerfil" style="margin:0; font-size:16px;">Usuário</h2><small style="color: #2ecc71;">Perfil ⚙️</small></div>
     </div>
   </div>
 
@@ -120,430 +39,94 @@
 
   <div id="lista" class="lista"></div>
 
-  <!-- RODAPÉ -->
   <div class="rodape">
-    <button onclick="adicionarDivida()">➕<br>Acordo</button>
-    <button class="destaque" onclick="abrirSutelloChat()">🤖<br>Sutello AI</button>
-    <button onclick="abrirPerfil()">⚙️<br>Perfil</button>
+    <button onclick="adicionarDivida()">➕ Novo Acordo</button>
+    <button onclick="abrirAnaliseDiaria()" style="background: #7b2ff7;">📊 Fluxo</button>
+    <button onclick="abrirCalculadora()">🧮 Calc</button>
   </div>
 </div>
 
-<!-- ================= MODAIS DA APLICAÇÃO ================= -->
+<div id="modalNovaDivida" class="modal" style="display:none;">
+    <div class="modal-conteudo">
+        <h3 style="margin-top:0; text-align:center; color:#ffffff;">➕ Registrar Acordo</h3>
+        
+        <label>Credor (Ex: Nubank, Itaú)</label>
+        <input id="newNome" type="text" placeholder="Nome do banco/loja">
+        
+        <label>Valor Original da Dívida (Opcional)</label>
+        <input id="newValorOriginal" type="number" placeholder="Ex: 5000.00">
 
-<!-- Modal Genérico de Alerta/Confirmação -->
-<div id="modalDialogo" class="modal" style="display:none; z-index: 10000;">
-    <div class="modal-conteudo" style="text-align:center; padding: 25px 20px;">
-        <h3 id="mdTitulo" style="margin-top:0; color:#fff; font-size:18px;">Aviso</h3>
-        <p id="mdMensagem" style="color:#aaa; font-size:15px; margin-bottom:20px; line-height:1.4;"></p>
-        <div style="display:flex; gap:10px;">
-            <button id="mdBtnCancelar" style="flex:1; background:#444; display:none;">Cancelar</button>
-            <button id="mdBtnOk" style="flex:1; background:#2ecc71;">OK</button>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL SUTELLO AI CHAT (AÇÃO E INTELIGÊNCIA) -->
-<div id="modalSutelloChat" class="modal" style="display:none; align-items: center; justify-content: center;">
-    <div class="modal-conteudo-chat">
-        <div class="chat-header">
-            <div class="chat-header-left">
-                <div class="avatar-container">
-                    <svg class="avatar-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="50" cy="50" r="48" fill="#7b2ff7"/>
-                        <path d="M50,25 C33,25 32,45 32,55 C32,68 40,75 50,75 C60,75 68,68 68,55 C68,45 67,25 50,25 Z" fill="#ffd1b3"/>
-                        <path d="M50,20 C32,20 28,32 30,42 C33,35 40,32 50,35 C60,32 67,35 70,42 C72,32 68,20 50,20 Z" fill="#2d2d30"/>
-                        <path d="M30,35 C28,35 27,42 27,48 C30,48 31,40 31,35 Z" fill="#2d2d30"/>
-                        <path d="M70,35 C72,35 73,42 73,48 C70,48 69,40 69,35 Z" fill="#2d2d30"/>
-                        <rect x="34" y="44" width="13" height="10" rx="3" fill="none" stroke="#111" stroke-width="2.5"/>
-                        <rect x="53" y="44" width="13" height="10" rx="3" fill="none" stroke="#111" stroke-width="2.5"/>
-                        <line x1="47" y1="49" x2="53" y2="49" stroke="#111" stroke-width="2.5"/>
-                        <circle cx="40" cy="49" r="2" fill="#111"/>
-                        <circle cx="60" cy="49" r="2" fill="#111"/>
-                        <path d="M45,63 Q50,68 55,63" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"/>
-                        <path d="M30,73 C30,73 35,90 50,90 C65,90 70,73 70,73 L62,95 L38,95 Z" fill="#1a1a24"/>
-                        <path d="M44,75 L50,83 L56,75" fill="none" stroke="#7b2ff7" stroke-width="3"/>
-                    </svg>
-                    <span class="avatar-status" id="sutelloStatus"></span>
-                </div>
-                <div>
-                    <h3 class="chat-title">Sutello AI Avançado</h3>
-                    <span class="chat-subtitle" id="sutelloSubtitulo">Assistente & Gerente ⚡</span>
-                </div>
+        <label>Valor do ACORDO (Fechado)</label>
+        <input id="newValor" type="number" placeholder="Ex: 1500.00" oninput="calcularPrevia()">
+        
+        <label>Vencimento da 1ª Parcela</label>
+        <input id="newData" type="date">
+        
+        <div style="background:#2a2a36; padding:10px; border-radius:8px; margin-bottom:15px; margin-top:10px;">
+            <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                <input id="newParcelado" type="checkbox" onchange="toggleParcelasInput()" style="width:20px; height:20px;">
+                <span>Acordo Parcelado?</span>
+            </label>
+            
+            <div id="divParcelas" style="display:none; margin-top:10px; border-top:1px solid #444; padding-top:10px;">
+                <label>Quantas vezes?</label>
+                <input id="newQtd" type="number" placeholder="Ex: 12" oninput="calcularPrevia()">
+                <p id="txtPrevia" style="font-size:13px; color:#00e676; margin-top:5px; text-align:center; font-weight:bold;"></p>
             </div>
-            <button class="chat-close-btn" onclick="fecharSutelloChat()">&times;</button>
         </div>
 
-        <div id="chatHistoryContainer" class="chat-messages-container"></div>
-
-        <div class="chat-chips-container" id="chatChipsContainer">
-            <button class="chat-chip" onclick="enviarTextoSugerido('Adicione uma conta de Carro, 10000 em 5x para 15 do mês que vem')">🚘 Cadastrar Carro</button>
-            <button class="chat-chip" onclick="enviarTextoSugerido('Me mostre o total do App Financeiro do mês atual')">💳 Resumo Finanças</button>
-            <button class="chat-chip" onclick="enviarTextoSugerido('O que vence na próxima semana?')">📅 Próxima Semana</button>
-        </div>
-
-        <div class="chat-input-area">
-            <input type="text" id="chatInputField" placeholder="Ex: Adicione uma conta de luz..." onkeydown="if(event.key === 'Enter') enviarMensagemSutello()">
-            <button id="chatSendButton" onclick="enviarMensagemSutello()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                </svg>
-            </button>
+        <div style="display:flex; gap:10px;">
+            <button onclick="salvarDividaFormulario()" style="flex:1; background:#2ecc71;">SALVAR</button>
+            <button onclick="fecharModalAdicionar()" style="flex:1; background:#444;">CANCELAR</button>
         </div>
     </div>
 </div>
 
-<!-- Modal Perfil -->
+<div id="modalAnalise" class="modal" style="display:none;">
+    <div class="modal-conteudo" style="max-width: 400px;">
+        <h3 style="text-align:center; color:#7b2ff7;">📊 Fluxo Diário Integrado</h3>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <input type="month" id="mesFiltroAnalise" style="flex:1; padding:12px; border-radius:8px; background:#222; color:white; border:1px solid #444;">
+            <button onclick="gerarAnaliseDiaria()" style="background:#7b2ff7; padding:10px 20px; border-radius:8px; border:none; color:white; font-weight:bold;">VER</button>
+        </div>
+        <div id="corpoAnalise" style="max-height: 350px; overflow-y: auto;">
+            <p style="text-align:center; color:#666;">Selecione o mês e o ano para calcular.</p>
+        </div>
+
+        <button onclick="fecharAnaliseDiaria()" style="width:100%; background:#444; margin-top:15px; border:none; padding:12px; border-radius:8px; color:white;">Voltar</button>
+    </div>
+</div>
+
+
+
 <div id="modalPerfil" class="modal" style="display:none;">
     <div class="modal-conteudo" style="text-align:center;">
-        <img id="previewFotoPerfil" src="https://via.placeholder.com/90" style="width:90px; height:90px; border-radius:50%; border:3px solid #2ecc71; object-fit:cover;">
-        <input type="file" id="uploadFotoNova" hidden accept="image/*" onchange="salvarNovaFoto(event)">
-        <button onclick="document.getElementById('uploadFotoNova').click()" style="background:#3a3a46; margin:15px 0; width:100%;">📸 Alterar Foto</button>
+        <img id="previewFotoPerfil" style="width:90px; height:90px; border-radius:50%; border:2px solid #2ecc71;">
+        <input type="file" id="uploadFotoNova" hidden onchange="salvarNovaFoto(event)">
+        <button onclick="document.getElementById('uploadFotoNova').click()" style="background:#444; margin:10px 0;">📸 Foto</button>
         <input type="text" id="inputNomePerfil" placeholder="Seu Nome">
-        <button onclick="salvarNomePerfil()" style="background:#2ecc71; width:100%; margin-bottom:10px;">💾 Salvar Nome</button>
-        <button onclick="sairDaConta()" style="background:#ef5350; width:100%; margin-top:15px;">🚪 SAIR DA CONTA</button>
-        <button onclick="fecharModalPerfil()" style="background:transparent; border:1px solid #444; width:100%; margin-top:15px; color:#aaa;">Voltar</button>
+        <button onclick="salvarNomePerfil()" style="background:#2ecc71; width:100%;">💾 Salvar</button>
+        <button onclick="sairDaConta()" style="background:#ef5350; width:100%; margin-top:15px;">🚪 SAIR</button>
+        <button onclick="fecharModalPerfil()" style="background:transparent; border:1px solid #444; width:100%; margin-top:10px;">Voltar</button>
     </div>
 </div>
 
-<!-- ================= LÓGICA JAVASCRIPT ================= -->
+<div id="modalCalc" class="modal" style="display:none"><div class="modal-conteudo"><h3>🧮 Calc</h3><input type="text" id="calcDisplay" readonly><div class="calc-grid"><button onclick="calcAdd('7')">7</button><button onclick="calcAdd('8')">8</button><button onclick="calcAdd('9')">9</button><button onclick="calcAdd('/')">÷</button><button onclick="calcAdd('4')">4</button><button onclick="calcAdd('5')">5</button><button onclick="calcAdd('6')">6</button><button onclick="calcAdd('*')">×</button><button onclick="calcAdd('1')">1</button><button onclick="calcAdd('2')">2</button><button onclick="calcAdd('3')">3</button><button onclick="calcAdd('-')">−</button><button onclick="calcAdd('0')">0</button><button onclick="calcAdd('.')">.</button><button onclick="calcCalcular()" style="background:#2ecc71;">=</button><button onclick="calcAdd('+')">+</button></div><button onclick="calcLimpar()" style="background:#ef5350; width:100%; margin-top:10px;">C</button><button onclick="fecharCalculadora()" style="background:#444; width:100%; margin-top:10px;">Fechar</button></div></div>
+
+<script src="app.js"></script>
 <script>
-// --- FUNÇÕES DE INTERFACE UI ---
-function mostrarMensagem(msg, titulo = "Aviso") {
-    document.getElementById('modalDialogo').style.display = 'flex';
-    document.getElementById('mdTitulo').innerText = titulo;
-    document.getElementById('mdMensagem').innerText = msg;
-    document.getElementById('mdBtnCancelar').style.display = 'none';
-    document.getElementById('mdBtnOk').onclick = () => { document.getElementById('modalDialogo').style.display = 'none'; };
-}
-
-function mostrarConfirmacao(msg, onConfirmar, titulo = "Confirmação") {
-    document.getElementById('modalDialogo').style.display = 'flex';
-    document.getElementById('mdTitulo').innerText = titulo;
-    document.getElementById('mdMensagem').innerText = msg;
-    document.getElementById('mdBtnCancelar').style.display = 'block';
-    document.getElementById('mdBtnCancelar').onclick = () => { document.getElementById('modalDialogo').style.display = 'none'; };
-    document.getElementById('mdBtnOk').onclick = () => { document.getElementById('modalDialogo').style.display = 'none'; if(onConfirmar) onConfirmar(); };
-}
-
-// --- CONFIGURAÇÃO FIREBASE ---
-const firebaseConfig = {
-    apiKey: "AIzaSyDDguzJOP5GKqlqf8GW-xdsTCxh1Ha7C7k",
-    authDomain: "sutello-financeiro.firebaseapp.com",
-    projectId: "sutello-financeiro",
-    storageBucket: "sutello-financeiro.firebasestorage.app",
-    messagingSenderId: "460447549653",
-    appId: "1:460447549653:web:a36b0c7d2c2919ff633a5c"
-};
-
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-// 🔴 ATENÇÃO: COLOQUE A SUA NOVA CHAVE AQUI ABAIXO. ELA DEVE COMEÇAR COM "AIza..."
-const apiKey = "AQ.Ab8RN6L0R00-GdFKydBTO7fPeoyGU2ahRHJ2TMNLKMFEDK0R5A"; 
-
-let dividas = []; // App Limpa Nome
-let contasFinanceiras = []; // App Financeiro Principal
-let filtro = "todas"; 
-let usuarioNomeAtual = "Usuário";
-
-// --- LOGIN E SINCRONIZAÇÃO DE DADOS ---
-auth.onAuthStateChanged(user => {
-    if (user) {
-        document.getElementById("lock").style.display = "none";
-        document.getElementById("app").style.display = "block";
-        
-        // Ouve Acordos
-        db.collection("dados_limpanome").doc(user.uid).onSnapshot(doc => {
-            if (doc.exists) { dividas = doc.data().dividas || []; render(); }
-        }, err => console.error("Erro:", err));
-        
-        // Ouve Contas Financeiras
-        db.collection("dados_financeiros").doc(user.uid).onSnapshot(doc => {
-            if (doc.exists) { contasFinanceiras = doc.data().contas || []; }
-        }, err => console.error("Erro:", err));
-        
-        // Ouve Perfil
-        db.collection("usuarios_limpanome").doc(user.uid).onSnapshot(doc => {
-            if (doc.exists) {
-                const d = doc.data();
-                if(d.foto) { document.getElementById("fotoPerfil").src = d.foto; document.getElementById("previewFotoPerfil").src = d.foto; }
-                if(d.nome) { usuarioNomeAtual = d.nome; document.getElementById("nomePerfil").innerText = d.nome; document.getElementById("inputNomePerfil").value = d.nome; }
-            }
-        });
-    } else {
-        document.getElementById("lock").style.display = "flex";
-        document.getElementById("app").style.display = "none";
-    }
-});
-
-function fazerLoginFirebase() {
-    const e = document.getElementById("loginEmail").value, s = document.getElementById("loginSenha").value;
-    if(e && s) auth.signInWithEmailAndPassword(e, s).catch(() => mostrarMensagem("E-mail ou senha incorretos.", "Erro"));
-    else mostrarMensagem("Preencha e-mail e senha.");
-}
-function sairDaConta() { mostrarConfirmacao("Deseja sair?", () => { auth.signOut().then(() => location.reload()); }); }
-
-// --- PERSISTÊNCIA DE DADOS ---
-function salvarAcordos() { 
-    if(auth.currentUser) db.collection("dados_limpanome").doc(auth.currentUser.uid).set({dividas}, {merge:true}); 
-    render(); 
-}
-function salvarContasAppFinanceiro() { 
-    if(auth.currentUser) db.collection("dados_financeiros").doc(auth.currentUser.uid).set({contas: contasFinanceiras}, {merge:true}); 
-}
-
-// --- RENDERIZAÇÃO VISUAL (Tela Principal exibe apenas os Acordos) ---
-function render() {
-    const lista = document.getElementById("lista");
-    if(!lista) return;
-    lista.innerHTML = "";
-
-    const grupos = {};
-    [...dividas].sort((a,b) => new Date(a.vencimento) - new Date(b.vencimento)).forEach(d => {
-        const dt = new Date(d.vencimento + "T12:00:00");
-        const k = (dt.getMonth() + 1).toString().padStart(2, '0') + "/" + dt.getFullYear();
-        if(!grupos[k]) grupos[k] = [];
-        grupos[k].push(d);
-    });
-
-    Object.keys(grupos).forEach(k => {
-        const todasDoMes = grupos[k];
-        const visiveis = todasDoMes.filter(d => filtro === "pagas" ? d.paga : !d.paga);
-
-        if (visiveis.length === 0) return;
-
-        let totalMes = 0, pagoMes = 0;
-        todasDoMes.forEach(d => { totalMes += d.valor; if(d.paga) pagoMes += d.valor; });
-        const falta = totalMes - pagoMes;
-        const porcentagem = totalMes > 0 ? ((pagoMes/totalMes)*100).toFixed(0) : 0;
-
-        const bloco = document.createElement("div");
-        bloco.className = "mes-container";
-        bloco.innerHTML = `
-          <div class="cabecalho-mes"><h3>📅 ${k}</h3></div>
-          <div class="resumo-mes">
-              <div class="resumo-item"><small>Total Acordos</small><strong style="font-size:14px;">R$ ${totalMes.toFixed(2)}</strong></div>
-              <div class="resumo-item"><small>Quitado</small><strong style="color:#2ecc71; font-size:14px;">R$ ${pagoMes.toFixed(2)}</strong></div>
-              <div class="resumo-item"><small>Falta</small><strong style="color:#ef5350; font-size:14px;">R$ ${falta.toFixed(2)}</strong></div>
-              <div class="barra-container"><div class="barra-fundo"><div class="barra-preenchimento" style="width: ${porcentagem}%"></div></div></div>
-          </div>
-        `;
-
-        visiveis.forEach(d => {
-            const div = document.createElement("div");
-            div.className = d.paga ? "conta verde" : "conta";
-            div.innerHTML = `
-                <div style="font-size: 1.1em; margin-bottom: 8px;"><strong>🏦 ${d.nome}</strong></div>
-                <div style="font-size: 1.3em; font-weight: bold; margin-bottom: 5px;">💰 R$ ${d.valor.toFixed(2)}</div>
-                <div style="color:#aaa; font-size:13px; margin-bottom: 10px;">📅 Vencimento: ${d.vencimento.split("-").reverse().join("/")}</div>
-                <div class="info-parcelas" style="background:#111; padding:8px 12px; border-radius:8px; display:inline-block; font-size:12px; border:1px solid #333;">📦 Parcela ${d.parcelaAtual || 1} de ${d.totalParcelas || 1}</div>
-                <div style="display:flex; gap:10px; margin-top:15px;">
-                    ${!d.paga ? `<button onclick="pagarDivida('${d.id}')" style="flex:3; background:#2ecc71; padding:12px; border-radius:8px;">✅ QUITAR</button>` : `<button onclick="desfazerPagamento('${d.id}')" style="flex:3; background:#444; padding:12px; border-radius:8px;">↩️ DESFAZER</button>`}
-                </div>
-            `;
-            bloco.appendChild(div);
-        });
-        lista.appendChild(bloco);
-    });
-}
-
-function pagarDivida(id) {
-    const d = dividas.find(x => x.id === id);
-    if(!d) return;
-    d.paga = true;
-    if(d.totalParcelas > 0 && d.parcelaAtual < d.totalParcelas) {
-        const dt = new Date(d.vencimento + "T12:00:00"); dt.setMonth(dt.getMonth() + 1);
-        dividas.push({ ...d, id: Date.now().toString(), paga: false, parcelaAtual: d.parcelaAtual + 1, vencimento: dt.toISOString().split("T")[0] });
-    }
-    salvarAcordos();
-}
-
-function desfazerPagamento(id) { const d = dividas.find(x => x.id === id); if(d) { d.paga = false; salvarAcordos(); } }
-function setFiltro(f, b) { filtro = f; document.querySelectorAll('.filtros button').forEach(x => x.classList.remove('ativo')); b.classList.add('ativo'); render(); }
-
-// --- INTELIGÊNCIA ARTIFICIAL: SUTELLO AI ---
-
-function abrirSutelloChat() {
-    document.getElementById("modalSutelloChat").style.display = "flex";
-    const hasKey = apiKey && apiKey.trim() !== "";
-    document.getElementById("sutelloStatus").style.background = hasKey ? "#2ecc71" : "#f1c40f"; 
-
-    const container = document.getElementById("chatHistoryContainer");
-    if (container.innerHTML.trim() === "") {
-        const saudacao = new Date().getHours() < 12 ? "Bom dia" : (new Date().getHours() < 18 ? "Boa tarde" : "Boa noite");
-        let texto = `Olá, **${usuarioNomeAtual}**! ${saudacao}! 🤝\nSou o **Sutello**, seu gerente financeiro virtual.\n\n`;
-        if(hasKey && apiKey.startsWith("AIza")) {
-            texto += `Eu consigo gerenciar ativamente as contas do **App Financeiro** e os seus **Acordos**! Você pode pedir para eu:\n\n* **Cadastrar Contas:** *"Adicione luz, 150 reais, dia 10"* ou *"Pagar carro, 10000 em 5 vezes mês que vem"*.\n* **Editar ou Excluir:** *"Mude o valor da luz pra 120"* ou *"Exclua a conta do carro"*.\n* **Analisar:** *"O que falta pagar neste mês no app financeiro?"*`;
-        } else {
-            texto += `⚠️ *Atenção: A chave configurada no código não parece ser válida.* \nPor favor, insira uma chave real do Google Gemini (começada em AIza...) no arquivo fonte!`;
-        }
-        adicionarMensagemUI("sutello", texto);
-    }
-}
-
-function fecharSutelloChat() { document.getElementById("modalSutelloChat").style.display = "none"; }
-
-function adicionarMensagemUI(remetente, texto) {
-    const container = document.getElementById("chatHistoryContainer");
-    const wrapper = document.createElement("div");
-    wrapper.className = "chat-bubble-wrapper";
-    wrapper.innerHTML = `<div class="chat-bubble ${remetente}">${formatarMarkdown(texto)}</div>`;
-    container.appendChild(wrapper);
-    container.scrollTop = container.scrollHeight;
-}
-
-function formatarMarkdown(texto) {
-    if (!texto) return "";
-    let html = texto.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-    html = html.replace(/^\s*[-*]\s+(.*)$/gm, '<div style="display:flex; align-items:flex-start; gap:6px; margin: 5px 0 5px 12px;"><span style="color:#7b2ff7; font-weight:bold;">•</span><span>$1</span></div>');
-    html = html.replace(/\n/g, '<br>');
-    return html;
-}
-
-function enviarTextoSugerido(t) { document.getElementById("chatInputField").value = t; enviarMensagemSutello(); }
-
-// Motor de Extração e Execução de Ações da IA
-function processarAcoesIA(textoIA) {
-    const regex = /<sutello_action>([\s\S]*?)<\/sutello_action>/;
-    const match = textoIA.match(regex);
-    let textoLimpo = textoIA.replace(regex, "").trim();
-
-    if (match) {
-        try {
-            let jsonStr = match[1].replace(/```json/gi, '').replace(/```/g, '').trim();
-            const actions = JSON.parse(jsonStr);
-            let updateFinanceiro = false, updateAcordos = false;
-
-            actions.forEach(act => {
-                const isFinanceiro = act.action.includes("conta");
-                const isAcordo = act.action.includes("acordo");
-                const targetArray = isFinanceiro ? contasFinanceiras : dividas;
-
-                if (act.action === "add_conta" || act.action === "add_acordo") {
-                    targetArray.push({
-                        id: Date.now().toString() + Math.floor(Math.random()*1000),
-                        nome: act.nome, valor: parseFloat(act.valor), vencimento: act.vencimento,
-                        paga: false, totalParcelas: parseInt(act.qtdParcelas) || 1, parcelaAtual: 1
-                    });
-                    if(isFinanceiro) updateFinanceiro = true; else updateAcordos = true;
-                }
-                else if (act.action === "delete_conta" || act.action === "delete_acordo") {
-                    const i = targetArray.findIndex(x => x.id === act.id);
-                    if(i > -1) { targetArray.splice(i, 1); if(isFinanceiro) updateFinanceiro = true; else updateAcordos = true; }
-                }
-                else if (act.action === "edit_conta" || act.action === "edit_acordo") {
-                    const i = targetArray.findIndex(x => x.id === act.id);
-                    if(i > -1) { 
-                        if(act.nome) targetArray[i].nome = act.nome;
-                        if(act.valor) targetArray[i].valor = parseFloat(act.valor);
-                        if(act.vencimento) targetArray[i].vencimento = act.vencimento;
-                        if(isFinanceiro) updateFinanceiro = true; else updateAcordos = true;
-                    }
-                }
-            });
-
-            if (updateFinanceiro) salvarContasAppFinanceiro();
-            if (updateAcordos) salvarAcordos();
-
-        } catch(e) { console.error("Erro interno ao parsear comando JSON da IA", e); }
-    }
-    return textoLimpo;
-}
-
-function obterPromptAvancado() {
-    const hj = new Date();
-    const strData = `${hj.getDate().toString().padStart(2,'0')}/${(hj.getMonth()+1).toString().padStart(2,'0')}/${hj.getFullYear()}`;
-    
-    // Passa os IDs para que a IA consiga excluir ou editar
-    const ac = dividas.map(d => `[ID:${d.id}] ${d.nome}: R$ ${d.valor} | Vence: ${d.vencimento} | Status: ${d.paga?'PAGO':'PENDENTE'}`).join('\n');
-    const fn = contasFinanceiras.map(c => `[ID:${c.id}] ${c.nome}: R$ ${c.valor} | Vence: ${c.vencimento} | Status: ${c.paga?'PAGO':'PENDENTE'}`).join('\n');
-
-    return `Você é Sutello, um assistente de IA focado em Finanças. 
-Hoje é dia ${strData}. Usuário: ${usuarioNomeAtual}.
-=== ACORDOS (Limpa Nome) ===\n${ac || "Vazio"}\n=== CONTAS (App Financeiro) ===\n${fn || "Vazio"}\n
-Seu dever é responder as perguntas conversando normalmente com o usuário. Caso o usuário mande ADICIONAR, EDITAR ou EXCLUIR, você vai fazer isso enviando um comando secreto no final do texto.
-Por padrão, ao falar de contas ou adicionar algo genérico (ex: "pagar carro"), use as CONTAS (App Financeiro). Só use ACORDOS se o usuário mencionar acordo ou limpa nome.
-
-DICA DE MATEMÁTICA: Se o usuário pedir para adicionar "10000 em 5 vezes", você DEVE dividir. O "valor" da parcela será 2000. Calcule a data de vencimento corretamente para o formato AAAA-MM-DD.
-
-Se você precisar modificar os dados, ANEXE AO FINAL DA RESPOSTA ESTE BLOCO ESTREITAMENTE EM JSON, dentro de <sutello_action>:
-<sutello_action>
-[
-  {"action": "add_conta", "nome": "Carro", "valor": 2000, "vencimento": "2026-06-15", "qtdParcelas": 5},
-  {"action": "delete_conta", "id": "ID_DA_CONTA_AQUI"},
-  {"action": "edit_acordo", "id": "ID_DO_ACORDO", "valor": 150.50}
-]
-</sutello_action>
-Mantenha a resposta super amigável em português (pt-BR). Formate dinheiro como R$ XX,XX.`;
-}
-
-async function enviarMensagemSutello() {
-    const input = document.getElementById("chatInputField");
-    const txt = input.value.trim();
-    if (!txt) return;
-
-    adicionarMensagemUI("user", txt);
-    input.value = "";
-
-    const wrapperTyping = document.createElement("div");
-    wrapperTyping.className = "chat-bubble-wrapper";
-    wrapperTyping.id = "sutello-typing-wrapper";
-    wrapperTyping.innerHTML = `<div class="chat-typing-indicator"><div class="chat-typing-dot"></div><div class="chat-typing-dot"></div><div class="chat-typing-dot"></div></div>`;
-    document.getElementById("chatHistoryContainer").appendChild(wrapperTyping);
-    document.getElementById("chatHistoryContainer").scrollTop = document.getElementById("chatHistoryContainer").scrollHeight;
-
-    // SISTEMA DE PROTEÇÃO: Impede envio se a chave for visivelmente inválida
-    if (!apiKey || !apiKey.startsWith("AIza")) {
-        setTimeout(() => {
-            const tw = document.getElementById("sutello-typing-wrapper"); if(tw) tw.remove();
-            adicionarMensagemUI("sutello", `⚠️ **Acesso Negado:** A chave de API no seu código não é válida. Toda chave oficial do Google começa com "**AIza**". \n\nPor favor, acesse o [Google AI Studio](https://aistudio.google.com/), crie uma nova chave de API e substitua no código do aplicativo.`);
-        }, 1000);
-        return;
-    }
-
+  if ("serviceWorker" in navigator) { navigator.serviceWorker.register("service-worker.js"); }
+  window.checarVersaoServidor = async function() {
     try {
-        // Modelo alterado para o 1.5 Flash (mais seguro para chaves de produção/públicas do AI Studio)
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-        const resp = await fetch(url, { 
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify({ 
-                contents: [{ parts: [{ text: txt }] }], 
-                systemInstruction: { parts: [{ text: obterPromptAvancado() }] } 
-            }) 
-        });
-        
-        if (!resp.ok) {
-            // Captura o erro oficial do Google para evitar o "erro cego"
-            const errorData = await resp.json();
-            throw new Error(errorData.error?.message || `Erro de código: ${resp.status}`);
-        }
-        
-        const data = await resp.json();
-        
-        const tw = document.getElementById("sutello-typing-wrapper"); if(tw) tw.remove();
-        
-        const textoOriginalIA = data.candidates?.[0]?.content?.parts?.[0]?.text || "Desculpe, não consegui formular uma resposta.";
-        
-        const respostaUsuario = processarAcoesIA(textoOriginalIA);
-        adicionarMensagemUI("sutello", respostaUsuario);
-        
-    } catch(e) {
-        const tw = document.getElementById("sutello-typing-wrapper"); if(tw) tw.remove();
-        console.error("Erro completo da API:", e);
-        
-        // Exibe o erro de forma clara pro usuário no chat
-        adicionarMensagemUI("sutello", `⚠️ **Falha de Comunicação com o Google:**\n\n*Detalhe do erro:* ${e.message}\n\n*Verifique se sua chave de API está correta ou se sua cota gratuita acabou.*`);
-    }
-}
-
-// Funções utilitárias (Perfil / Sair / Modal Genérico)
-function abrirPerfil() { document.getElementById("modalPerfil").style.display = "flex"; }
-function fecharModalPerfil() { document.getElementById("modalPerfil").style.display = "none"; }
+      const resp = await fetch(window.location.origin + window.location.pathname + "?t=" + Date.now(), {cache:"no-store"});
+      const text = await resp.text();
+      const sv = new DOMParser().parseFromString(text, "text/html").querySelector('meta[name="app-version"]')?.content;
+      const lv = document.querySelector('meta[name="app-version"]')?.content;
+      if (sv && lv && sv !== lv) { if(confirm("Nova versão! Atualizar?")) { window.location.reload(true); } }
+    } catch(e) {}
+  };
+  setTimeout(window.checarVersaoServidor, 2000);
 </script>
 </body>
 </html>
