@@ -1,3 +1,4 @@
+html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -11,6 +12,227 @@
   <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    /* Estilos customizados e responsivos para o Chat do Sutello AI */
+    .modal-conteudo-chat {
+        background: #13131a;
+        width: 100%;
+        max-width: 480px;
+        height: 85vh;
+        max-height: 750px;
+        border-radius: 20px;
+        border: 1px solid #23232f;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+        animation: abrirSuave 0.25s ease-out;
+    }
+    @keyframes abrirSuave {
+        from { transform: scale(0.95); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+    @media (max-width: 480px) {
+        .modal-conteudo-chat {
+            height: 100%;
+            max-height: 100%;
+            border-radius: 0;
+            border: none;
+        }
+    }
+    .chat-header {
+        background: #1a1a24;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #23232f;
+    }
+    .chat-header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .avatar-container {
+        position: relative;
+        width: 44px;
+        height: 44px;
+    }
+    .avatar-svg {
+        width: 100%;
+        height: 100%;
+    }
+    .avatar-status {
+        position: absolute;
+        bottom: 1px;
+        right: 1px;
+        width: 10px;
+        height: 10px;
+        background: #2ecc71;
+        border: 2px solid #1a1a24;
+        border-radius: 50%;
+    }
+    .chat-title {
+        color: #ffffff;
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+    }
+    .chat-subtitle {
+        color: #2ecc71;
+        font-size: 11px;
+        display: block;
+        margin-top: 1px;
+        font-weight: 500;
+    }
+    .chat-close-btn {
+        background: transparent;
+        border: none;
+        color: #8a8a9e;
+        font-size: 28px;
+        cursor: pointer;
+        padding: 0 5px;
+        transition: color 0.2s;
+    }
+    .chat-close-btn:hover {
+        color: #ffffff;
+    }
+    .chat-messages-container {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        background: #111116;
+        scroll-behavior: smooth;
+    }
+    .chat-bubble-wrapper {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+    .chat-bubble {
+        max-width: 85%;
+        padding: 12px 16px;
+        border-radius: 16px;
+        font-size: 14px;
+        line-height: 1.5;
+        word-wrap: break-word;
+    }
+    .chat-bubble.sutello {
+        background: #1a1a24;
+        color: #e2e2e9;
+        align-self: flex-start;
+        border-bottom-left-radius: 4px;
+        border: 1px solid #23232f;
+    }
+    .chat-bubble.user {
+        background: #7b2ff7;
+        color: #ffffff;
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+    }
+    .chat-typing-indicator {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 12px 18px;
+        background: #1a1a24;
+        border-radius: 16px;
+        align-self: flex-start;
+        border-bottom-left-radius: 4px;
+        border: 1px solid #23232f;
+        margin-bottom: 5px;
+    }
+    .chat-typing-dot {
+        width: 8px;
+        height: 8px;
+        background: #7b2ff7;
+        border-radius: 50%;
+        animation: typingBreathe 1.4s infinite ease-in-out both;
+    }
+    .chat-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .chat-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingBreathe {
+        0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+        40% { transform: scale(1.1); opacity: 1; }
+    }
+    .chat-chips-container {
+        padding: 10px 15px;
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        background: #111116;
+        border-top: 1px solid #1a1a24;
+        white-space: nowrap;
+        scrollbar-width: none;
+    }
+    .chat-chips-container::-webkit-scrollbar {
+        display: none;
+    }
+    .chat-chip {
+        background: #1a1a24;
+        color: #8a8a9e;
+        border: 1px solid #23232f;
+        padding: 8px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-weight: 500;
+        flex-shrink: 0;
+    }
+    .chat-chip:hover {
+        background: #7b2ff7;
+        color: #ffffff;
+        border-color: #7b2ff7;
+    }
+    .chat-input-area {
+        background: #1a1a24;
+        padding: 12px 15px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        border-top: 1px solid #23232f;
+    }
+    .chat-input-area input {
+        flex: 1;
+        background: #111116;
+        border: 1px solid #23232f;
+        border-radius: 12px;
+        padding: 12px 15px;
+        color: #ffffff;
+        font-size: 14px;
+        outline: none;
+    }
+    .chat-input-area input:focus {
+        border-color: #7b2ff7;
+    }
+    .chat-input-area button {
+        width: 44px;
+        height: 44px;
+        background: #7b2ff7;
+        border: none;
+        border-radius: 12px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s;
+        flex-shrink: 0;
+    }
+    .chat-input-area button:hover {
+        background: #651bc7;
+    }
+    .chat-input-area button svg {
+        width: 18px;
+        height: 18px;
+    }
+  </style>
 </head>
 <body>
 
@@ -41,7 +263,7 @@
 
   <div class="rodape">
     <button onclick="adicionarDivida()">➕ Novo Acordo</button>
-    <button onclick="abrirAnaliseDiaria()" style="background: #7b2ff7;">📊 Fluxo</button>
+    <button onclick="abrirSutelloChat()" style="background: #7b2ff7;">🤖 Organização</button>
     <button onclick="abrirCalculadora()">🧮 Calc</button>
   </div>
 </div>
@@ -82,23 +304,68 @@
     </div>
 </div>
 
-<div id="modalAnalise" class="modal" style="display:none;">
-    <div class="modal-conteudo" style="max-width: 400px;">
-        <h3 style="text-align:center; color:#7b2ff7;">📊 Fluxo Diário Integrado</h3>
-        
-        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <input type="month" id="mesFiltroAnalise" style="flex:1; padding:12px; border-radius:8px; background:#222; color:white; border:1px solid #444;">
-            <button onclick="gerarAnaliseDiaria()" style="background:#7b2ff7; padding:10px 20px; border-radius:8px; border:none; color:white; font-weight:bold;">VER</button>
-        </div>
-        <div id="corpoAnalise" style="max-height: 350px; overflow-y: auto;">
-            <p style="text-align:center; color:#666;">Selecione o mês e o ano para calcular.</p>
+<!-- MODAL SUTELLO AI CHAT (ORGANIZAÇÃO FINANCEIRA) -->
+<div id="modalSutelloChat" class="modal" style="display:none; align-items: center; justify-content: center;">
+    <div class="modal-conteudo-chat">
+        <!-- Cabeçalho -->
+        <div class="chat-header">
+            <div class="chat-header-left">
+                <!-- Avatar do desenvolvedor Sutello (Estilo Vetor Amigável) -->
+                <div class="avatar-container">
+                    <svg class="avatar-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="48" fill="#7b2ff7"/>
+                        <!-- Rosto -->
+                        <path d="M50,25 C33,25 32,45 32,55 C32,68 40,75 50,75 C60,75 68,68 68,55 C68,45 67,25 50,25 Z" fill="#ffd1b3"/>
+                        <!-- Cabelo Moderno Escuro -->
+                        <path d="M50,20 C32,20 28,32 30,42 C33,35 40,32 50,35 C60,32 67,35 70,42 C72,32 68,20 50,20 Z" fill="#2d2d30"/>
+                        <path d="M30,35 C28,35 27,42 27,48 C30,48 31,40 31,35 Z" fill="#2d2d30"/>
+                        <path d="M70,35 C72,35 73,42 73,48 C70,48 69,40 69,35 Z" fill="#2d2d30"/>
+                        <!-- Óculos Inteligentes -->
+                        <rect x="34" y="44" width="13" height="10" rx="3" fill="none" stroke="#111" stroke-width="2.5"/>
+                        <rect x="53" y="44" width="13" height="10" rx="3" fill="none" stroke="#111" stroke-width="2.5"/>
+                        <line x1="47" y1="49" x2="53" y2="49" stroke="#111" stroke-width="2.5"/>
+                        <!-- Olhos -->
+                        <circle cx="40" cy="49" r="2" fill="#111"/>
+                        <circle cx="60" cy="49" r="2" fill="#111"/>
+                        <!-- Sorriso Confiante -->
+                        <path d="M45,63 Q50,68 55,63" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"/>
+                        <!-- Roupa Organizada -->
+                        <path d="M30,73 C30,73 35,90 50,90 C65,90 70,73 70,73 L62,95 L38,95 Z" fill="#1a1a24"/>
+                        <path d="M44,75 L50,83 L56,75" fill="none" stroke="#7b2ff7" stroke-width="3"/>
+                    </svg>
+                    <span class="avatar-status"></span>
+                </div>
+                <div>
+                    <h3 class="chat-title" id="chatTitleNome">Sutello AI</h3>
+                    <span class="chat-subtitle">Organização Inteligente 💡</span>
+                </div>
+            </div>
+            <button class="chat-close-btn" onclick="fecharSutelloChat()">&times;</button>
         </div>
 
-        <button onclick="fecharAnaliseDiaria()" style="width:100%; background:#444; margin-top:15px; border:none; padding:12px; border-radius:8px; color:white;">Voltar</button>
+        <!-- Histórico de Mensagens -->
+        <div id="chatHistoryContainer" class="chat-messages-container"></div>
+
+        <!-- Sugestões de Perguntas (Chips Rápidos deslizantes) -->
+        <div class="chat-chips-container" id="chatChipsContainer">
+            <button class="chat-chip" onclick="enviarTextoSugerido('Me mostre o resumo do mês atual')">📅 Resumo deste mês</button>
+            <button class="chat-chip" onclick="enviarTextoSugerido('Mostre as contas pendentes deste mês')">🔍 Contas pendentes</button>
+            <button class="chat-chip" onclick="enviarTextoSugerido('O que vence hoje?')">❓ O que vence hoje?</button>
+            <button class="chat-chip" onclick="enviarTextoSugerido('Me dê uma dica rápida de economia')">💡 Dica de economia</button>
+        </div>
+
+        <!-- Área de Entrada de Texto -->
+        <div class="chat-input-area">
+            <input type="text" id="chatInputField" placeholder="Pergunte ao Sutello..." onkeydown="if(event.key === 'Enter') enviarMensagemSutello()">
+            <button id="chatSendButton" onclick="enviarMensagemSutello()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
     </div>
 </div>
-
-
 
 <div id="modalPerfil" class="modal" style="display:none;">
     <div class="modal-conteudo" style="text-align:center;">
