@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -239,7 +240,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// INSIRA SUA CHAVE DA IA AQUI PARA ATIVAR OS SUPER PODERES (Ex: "AIzaSy...")
+// 🔴 ATENÇÃO: COLOQUE A SUA NOVA CHAVE AQUI ABAIXO. ELA DEVE COMEÇAR COM "AIza..."
 const apiKey = "AQ.Ab8RN6L0R00-GdFKydBTO7fPeoyGU2ahRHJ2TMNLKMFEDK0R5A"; 
 
 let dividas = []; // App Limpa Nome
@@ -373,10 +374,10 @@ function abrirSutelloChat() {
     if (container.innerHTML.trim() === "") {
         const saudacao = new Date().getHours() < 12 ? "Bom dia" : (new Date().getHours() < 18 ? "Boa tarde" : "Boa noite");
         let texto = `Olá, **${usuarioNomeAtual}**! ${saudacao}! 🤝\nSou o **Sutello**, seu gerente financeiro virtual.\n\n`;
-        if(hasKey) {
+        if(hasKey && apiKey.startsWith("AIza")) {
             texto += `Eu consigo gerenciar ativamente as contas do **App Financeiro** e os seus **Acordos**! Você pode pedir para eu:\n\n* **Cadastrar Contas:** *"Adicione luz, 150 reais, dia 10"* ou *"Pagar carro, 10000 em 5 vezes mês que vem"*.\n* **Editar ou Excluir:** *"Mude o valor da luz pra 120"* ou *"Exclua a conta do carro"*.\n* **Analisar:** *"O que falta pagar neste mês no app financeiro?"*`;
         } else {
-            texto += `⚠️ *Modo Local Ativo: Cadastre sua chave de IA no código para eu poder criar, excluir e editar contas usando IA.*\nPor enquanto, me faça perguntas sobre o que você já tem cadastrado!`;
+            texto += `⚠️ *Atenção: A chave configurada no código não parece ser válida.* \nPor favor, insira uma chave real do Google Gemini (começada em AIza...) no arquivo fonte!`;
         }
         adicionarMensagemUI("sutello", texto);
     }
@@ -495,32 +496,48 @@ async function enviarMensagemSutello() {
     document.getElementById("chatHistoryContainer").appendChild(wrapperTyping);
     document.getElementById("chatHistoryContainer").scrollTop = document.getElementById("chatHistoryContainer").scrollHeight;
 
-    if (!apiKey) {
+    // SISTEMA DE PROTEÇÃO: Impede envio se a chave for visivelmente inválida
+    if (!apiKey || !apiKey.startsWith("AIza")) {
         setTimeout(() => {
             const tw = document.getElementById("sutello-typing-wrapper"); if(tw) tw.remove();
-            adicionarMensagemUI("sutello", `Como estou rodando **offline/sem chave API**, eu não consigo criar contas para você (isso exige inteligência cognitiva avançada).\nNo entanto, saiba que seu sistema tem:\n- **${contasFinanceiras.length} contas financeiras** no banco de dados.\n- **${dividas.length} acordos** vigentes.\n\nColoque sua API do Gemini no código para liberar todo meu potencial!`);
+            adicionarMensagemUI("sutello", `⚠️ **Acesso Negado:** A chave de API no seu código não é válida. Toda chave oficial do Google começa com "**AIza**". \n\nPor favor, acesse o [Google AI Studio](https://aistudio.google.com/), crie uma nova chave de API e substitua no código do aplicativo.`);
         }, 1000);
         return;
     }
 
     try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-        const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: txt }] }], systemInstruction: { parts: [{ text: obterPromptAvancado() }] } }) });
+        // Modelo alterado para o 1.5 Flash (mais seguro para chaves de produção/públicas do AI Studio)
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const resp = await fetch(url, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ 
+                contents: [{ parts: [{ text: txt }] }], 
+                systemInstruction: { parts: [{ text: obterPromptAvancado() }] } 
+            }) 
+        });
         
-        if (!resp.ok) throw new Error();
+        if (!resp.ok) {
+            // Captura o erro oficial do Google para evitar o "erro cego"
+            const errorData = await resp.json();
+            throw new Error(errorData.error?.message || `Erro de código: ${resp.status}`);
+        }
+        
         const data = await resp.json();
         
         const tw = document.getElementById("sutello-typing-wrapper"); if(tw) tw.remove();
         
-        const textoOriginalIA = data.candidates?.[0]?.content?.parts?.[0]?.text || "Desculpe, ocorreu um erro.";
+        const textoOriginalIA = data.candidates?.[0]?.content?.parts?.[0]?.text || "Desculpe, não consegui formular uma resposta.";
         
-        // Magia: Extrai a ação JSON, processa no banco de dados e retorna o texto formatado limpo para o usuário
         const respostaUsuario = processarAcoesIA(textoOriginalIA);
         adicionarMensagemUI("sutello", respostaUsuario);
         
     } catch(e) {
         const tw = document.getElementById("sutello-typing-wrapper"); if(tw) tw.remove();
-        adicionarMensagemUI("sutello", "⚠️ *Houve um problema ao conectar com a inteligência.* Verifique a conexão com a internet.");
+        console.error("Erro completo da API:", e);
+        
+        // Exibe o erro de forma clara pro usuário no chat
+        adicionarMensagemUI("sutello", `⚠️ **Falha de Comunicação com o Google:**\n\n*Detalhe do erro:* ${e.message}\n\n*Verifique se sua chave de API está correta ou se sua cota gratuita acabou.*`);
     }
 }
 
