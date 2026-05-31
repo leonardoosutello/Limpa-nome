@@ -1,4 +1,4 @@
-const CACHE_NAME = "LimpaNome-v2.1.2";
+const CACHE_NAME = "LimpaNome&";
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
