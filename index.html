@@ -2,11 +2,11 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="app-version" content="9.0.0">
+  <meta name="app-version" content="110.0.0">
   <title>Limpa Nome - Acordos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0f0f14">
+  <meta name="theme-color" content="#0d0d12">
   <link rel="stylesheet" href="style.css">
   <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-auth-compat.js"></script>
@@ -14,21 +14,27 @@
 </head>
 <body>
 
-<div id="lock" class="lock" style="background: #0f0f14;">
-  <div style="text-align:center; padding: 20px; max-width: 300px;">
-    <div style="font-size: 60px; margin-bottom: 20px;">🤝</div>
-    <h2 style="color:white; margin-bottom: 10px;">Limpa Nome</h2>
-    <input type="email" id="loginEmail" placeholder="E-mail" style="width:100%; padding:15px; border-radius:12px; border:1px solid #444; background:#222; color:white; margin-bottom:10px;">
-    <input type="password" id="loginSenha" placeholder="Senha" style="width:100%; padding:15px; border-radius:12px; border:1px solid #444; background:#222; color:white; margin-bottom:20px;">
-    <button onclick="fazerLoginFirebase()" style="width:100%; background:#2ecc71; color:white; padding:15px; border-radius:12px; font-weight:bold; border:none;">ENTRAR</button>
+<!-- LOCK -->
+<div id="lock" class="lock">
+  <div class="lock-box">
+    <div class="lock-logo">🤝</div>
+    <h2>Limpa Nome</h2>
+    <p>Gestão de acordos financeiros</p>
+    <input class="lock-input" type="email" id="loginEmail" placeholder="E-mail">
+    <input class="lock-input" type="password" id="loginSenha" placeholder="Senha">
+    <button class="btn-login" onclick="fazerLoginFirebase()">ENTRAR</button>
   </div>
 </div>
 
+<!-- APP -->
 <div id="app" style="display:none">
   <div class="topo">
     <div class="perfil" onclick="abrirPerfil()">
       <img id="fotoPerfil" src="https://via.placeholder.com/50">
-      <div><h2 id="nomePerfil" style="margin:0; font-size:16px;">Usuário</h2><small style="color: #2ecc71;">Perfil ⚙️</small></div>
+      <div class="perfil-info">
+        <h2 id="nomePerfil">Usuário</h2>
+        <small>Perfil ⚙️</small>
+      </div>
     </div>
   </div>
 
@@ -41,78 +47,99 @@
 
   <div class="rodape">
     <button onclick="adicionarDivida()">➕ Novo Acordo</button>
-    <button onclick="abrirAnaliseDiaria()" style="background: #7b2ff7;">📊 Fluxo</button>
+    <button class="btn-fluxo" onclick="abrirAnaliseDiaria()">📊 Fluxo</button>
     <button onclick="abrirCalculadora()">🧮 Calc</button>
   </div>
 </div>
 
+<!-- MODAL NOVO ACORDO -->
 <div id="modalNovaDivida" class="modal" style="display:none;">
-    <div class="modal-conteudo">
-        <h3 style="margin-top:0; text-align:center; color:#ffffff;">➕ Registrar Acordo</h3>
-        
-        <label>Credor (Ex: Nubank, Itaú)</label>
-        <input id="newNome" type="text" placeholder="Nome do banco/loja">
-        
-        <label>Valor Original da Dívida (Opcional)</label>
-        <input id="newValorOriginal" type="number" placeholder="Ex: 5000.00">
+  <div class="modal-conteudo">
+    <div class="modal-handle"></div>
+    <p class="modal-titulo">Registrar Acordo</p>
 
-        <label>Valor do ACORDO (Fechado)</label>
-        <input id="newValor" type="number" placeholder="Ex: 1500.00" oninput="calcularPrevia()">
-        
-        <label>Vencimento da 1ª Parcela</label>
-        <input id="newData" type="date">
-        
-        <div style="background:#2a2a36; padding:10px; border-radius:8px; margin-bottom:15px; margin-top:10px;">
-            <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
-                <input id="newParcelado" type="checkbox" onchange="toggleParcelasInput()" style="width:20px; height:20px;">
-                <span>Acordo Parcelado?</span>
-            </label>
-            
-            <div id="divParcelas" style="display:none; margin-top:10px; border-top:1px solid #444; padding-top:10px;">
-                <label>Quantas vezes?</label>
-                <input id="newQtd" type="number" placeholder="Ex: 12" oninput="calcularPrevia()">
-                <p id="txtPrevia" style="font-size:13px; color:#00e676; margin-top:5px; text-align:center; font-weight:bold;"></p>
-            </div>
-        </div>
+    <label>Credor (banco / loja)</label>
+    <input id="newNome" type="text" placeholder="Ex: Nubank, Itaú">
 
-        <div style="display:flex; gap:10px;">
-            <button onclick="salvarDividaFormulario()" style="flex:1; background:#2ecc71;">SALVAR</button>
-            <button onclick="fecharModalAdicionar()" style="flex:1; background:#444;">CANCELAR</button>
-        </div>
+    <label>Valor original da dívida (opcional)</label>
+    <input id="newValorOriginal" type="number" placeholder="Ex: 5000.00">
+
+    <label>Valor do acordo fechado</label>
+    <input id="newValor" type="number" placeholder="Ex: 1500.00" oninput="calcularPrevia()">
+
+    <label>Vencimento da 1ª parcela</label>
+    <input id="newData" type="date">
+
+    <label class="check-row" style="margin-top:12px;">
+      <input id="newParcelado" type="checkbox" onchange="toggleParcelasInput()">
+      <span>Acordo parcelado?</span>
+    </label>
+
+    <div id="divParcelas" style="display:none; margin-top:10px;">
+      <label>Quantas parcelas?</label>
+      <input id="newQtd" type="number" placeholder="Ex: 12" oninput="calcularPrevia()">
+      <p id="txtPrevia" style="font-size:13px; color:var(--green); text-align:center; font-weight:700; margin:6px 0 0;"></p>
     </div>
+
+    <button class="btn-salvar" onclick="salvarDividaFormulario()">SALVAR</button>
+    <button class="btn-cancelar" onclick="fecharModalAdicionar()">Cancelar</button>
+  </div>
 </div>
 
+<!-- MODAL FLUXO DIÁRIO -->
 <div id="modalAnalise" class="modal" style="display:none;">
-    <div class="modal-conteudo" style="max-width: 400px;">
-        <h3 style="text-align:center; color:#7b2ff7;">📊 Fluxo Diário Integrado</h3>
-        
-        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <input type="month" id="mesFiltroAnalise" style="flex:1; padding:12px; border-radius:8px; background:#222; color:white; border:1px solid #444;">
-            <button onclick="gerarAnaliseDiaria()" style="background:#7b2ff7; padding:10px 20px; border-radius:8px; border:none; color:white; font-weight:bold;">VER</button>
-        </div>
-        <div id="corpoAnalise" style="max-height: 350px; overflow-y: auto;">
-            <p style="text-align:center; color:#666;">Selecione o mês e o ano para calcular.</p>
-        </div>
+  <div class="modal-conteudo" style="max-width:440px;">
+    <div class="modal-handle"></div>
+    <p class="modal-titulo" style="color:var(--purple);">📊 Fluxo Diário</p>
 
-        <button onclick="fecharAnaliseDiaria()" style="width:100%; background:#444; margin-top:15px; border:none; padding:12px; border-radius:8px; color:white;">Voltar</button>
+    <div style="display:flex; gap:8px; margin-bottom:14px;">
+      <input type="month" id="mesFiltroAnalise" style="flex:1; padding:12px 14px; border-radius:8px; background:var(--surface2); color:var(--text); border:1px solid var(--border2); font-size:14px; outline:none;">
+      <button onclick="gerarAnaliseDiaria()" style="background:var(--purple); padding:11px 18px; border-radius:8px; border:none; color:white; font-weight:700; font-size:14px; cursor:pointer;">VER</button>
     </div>
+
+    <div id="corpoAnalise" style="max-height:420px; overflow-y:auto;">
+      <p class="vazio">Selecione o mês para visualizar o fluxo.</p>
+    </div>
+
+    <button onclick="fecharAnaliseDiaria()" class="btn-cancelar" style="margin-top:14px;">Fechar</button>
+  </div>
 </div>
 
-
-
+<!-- MODAL PERFIL -->
 <div id="modalPerfil" class="modal" style="display:none;">
-    <div class="modal-conteudo" style="text-align:center;">
-        <img id="previewFotoPerfil" style="width:90px; height:90px; border-radius:50%; border:2px solid #2ecc71;">
-        <input type="file" id="uploadFotoNova" hidden onchange="salvarNovaFoto(event)">
-        <button onclick="document.getElementById('uploadFotoNova').click()" style="background:#444; margin:10px 0;">📸 Foto</button>
-        <input type="text" id="inputNomePerfil" placeholder="Seu Nome">
-        <button onclick="salvarNomePerfil()" style="background:#2ecc71; width:100%;">💾 Salvar</button>
-        <button onclick="sairDaConta()" style="background:#ef5350; width:100%; margin-top:15px;">🚪 SAIR</button>
-        <button onclick="fecharModalPerfil()" style="background:transparent; border:1px solid #444; width:100%; margin-top:10px;">Voltar</button>
+  <div class="modal-conteudo">
+    <div class="modal-handle"></div>
+    <p class="modal-titulo">Perfil</p>
+    <div class="perfil-foto-wrap">
+      <img id="previewFotoPerfil" src="https://via.placeholder.com/84">
+      <br>
+      <button onclick="document.getElementById('uploadFotoNova').click()" style="background:var(--surface3); color:var(--text2); border:1px solid var(--border2); font-size:13px; margin-top:10px; padding:8px 16px; border-radius:8px; cursor:pointer;">📸 Alterar foto</button>
+      <input type="file" id="uploadFotoNova" hidden onchange="salvarNovaFoto(event)">
     </div>
+    <label>Nome</label>
+    <input type="text" id="inputNomePerfil" placeholder="Seu nome">
+    <button class="btn-salvar" onclick="salvarNomePerfil()">💾 Salvar</button>
+    <button class="btn-sair" onclick="sairDaConta()">🚪 Sair da conta</button>
+    <button class="btn-cancelar" onclick="fecharModalPerfil()">Voltar</button>
+  </div>
 </div>
 
-<div id="modalCalc" class="modal" style="display:none"><div class="modal-conteudo"><h3>🧮 Calc</h3><input type="text" id="calcDisplay" readonly><div class="calc-grid"><button onclick="calcAdd('7')">7</button><button onclick="calcAdd('8')">8</button><button onclick="calcAdd('9')">9</button><button onclick="calcAdd('/')">÷</button><button onclick="calcAdd('4')">4</button><button onclick="calcAdd('5')">5</button><button onclick="calcAdd('6')">6</button><button onclick="calcAdd('*')">×</button><button onclick="calcAdd('1')">1</button><button onclick="calcAdd('2')">2</button><button onclick="calcAdd('3')">3</button><button onclick="calcAdd('-')">−</button><button onclick="calcAdd('0')">0</button><button onclick="calcAdd('.')">.</button><button onclick="calcCalcular()" style="background:#2ecc71;">=</button><button onclick="calcAdd('+')">+</button></div><button onclick="calcLimpar()" style="background:#ef5350; width:100%; margin-top:10px;">C</button><button onclick="fecharCalculadora()" style="background:#444; width:100%; margin-top:10px;">Fechar</button></div></div>
+<!-- MODAL CALCULADORA -->
+<div id="modalCalc" class="modal" style="display:none;">
+  <div class="modal-conteudo">
+    <div class="modal-handle"></div>
+    <p class="modal-titulo">Calculadora</p>
+    <input type="text" id="calcDisplay" readonly style="text-align:right; font-size:22px; font-weight:700; margin-bottom:10px;">
+    <div class="calc-grid">
+      <button onclick="calcAdd('7')">7</button><button onclick="calcAdd('8')">8</button><button onclick="calcAdd('9')">9</button><button onclick="calcAdd('/')" style="color:var(--purple); font-weight:800;">÷</button>
+      <button onclick="calcAdd('4')">4</button><button onclick="calcAdd('5')">5</button><button onclick="calcAdd('6')">6</button><button onclick="calcAdd('*')" style="color:var(--purple); font-weight:800;">×</button>
+      <button onclick="calcAdd('1')">1</button><button onclick="calcAdd('2')">2</button><button onclick="calcAdd('3')">3</button><button onclick="calcAdd('-')" style="color:var(--purple); font-weight:800;">−</button>
+      <button onclick="calcAdd('0')">0</button><button onclick="calcAdd('.')">.</button><button onclick="calcCalcular()" style="background:var(--green); color:white; font-size:18px;">=</button><button onclick="calcAdd('+')" style="color:var(--purple); font-weight:800;">+</button>
+    </div>
+    <button onclick="calcLimpar()" style="background:var(--red-dim); color:var(--red); border:1px solid rgba(239,68,68,0.2); width:100%; margin-top:10px; padding:12px; border-radius:8px; font-weight:700; cursor:pointer;">C — Limpar</button>
+    <button class="btn-cancelar" onclick="fecharCalculadora()">Fechar</button>
+  </div>
+</div>
 
 <script src="app.js"></script>
 <script>
@@ -123,7 +150,7 @@
       const text = await resp.text();
       const sv = new DOMParser().parseFromString(text, "text/html").querySelector('meta[name="app-version"]')?.content;
       const lv = document.querySelector('meta[name="app-version"]')?.content;
-      if (sv && lv && sv !== lv) { if(confirm("Nova versão! Atualizar?")) { window.location.reload(true); } }
+      if (sv && lv && sv !== lv) { if(confirm("Nova versão disponível! Atualizar?")) { window.location.reload(true); } }
     } catch(e) {}
   };
   setTimeout(window.checarVersaoServidor, 2000);
